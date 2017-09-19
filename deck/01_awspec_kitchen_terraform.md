@@ -1,6 +1,15 @@
 !SLIDE subsection
 
-# awspec kitchen terraform 
+# awspec kitchen terraform
+
+!SLIDE
+
+# approach
+- infrastructure as code
+- composable toolchain
+- test driven development
+- red, green, blue
+- three pass automation
 
 !SLIDE
 
@@ -11,9 +20,84 @@
 - integrate with application code workflows (Git, SCM, code review)
 - provide modular, sharable components for separation of concerns
 - distribution of knowledge, enables self-service (and vacations)
+- build, deploy, run, verify
 
 !SLIDE
 
+## composable toolchain
+<img style="float: right;" src="gears.png">
+
+- A set of specialized tools that can be chained together to form a larger process.
+- We can compose a complete picture by selecting the best tool for each given task in a pipeline.
+- Components can easily be updated or replaced as needed.
+- Easy to adapt processes to changing requirements, without having to retool the entire process.
+- Avoid vendor-lock when something better comes along.
+
+!SLIDE
+
+
+## test driven development (TDD)
+
+Test-Driven Development (TDD) is a popular software development process that involves writing code in short, repeating development cycles with the goal to enforce good design and enhance confidence.
+
+![fit](red-blue-green-recycling-md.png)
+
+devops.com: https://devops.com/agile-infrastructure-infrastructure-deserves-tests/
+
+!SLIDE
+
+## The Red, Green, Refactor Cycle
+
+- Red: Write test that fails.
+  - Understand the requirements and the state you want to implement. Implement the test, then run your entire test suite. The new test should fail.
+
+- Green: Write code to make the test pass.
+  - Implement just enough functionality to make the test pass. Don’t care much about readability, simplicity and design for now — just make it work. Run your tests again and watch all tests pass.
+
+- Refactor: Make it pretty.
+  -  Now that your tests pass, improve your implementation and make sure, by running your tests again, that you didn’t break anything.
+
+devops.com: https://devops.com/agile-infrastructure-infrastructure-deserves-tests/
+
+!SLIDE
+
+
+## Three-pass automation
+<img style="float: right;" src="multi-pass.jpg">
+
+- Pass 1: Do we know the steps?
+  - Don't try to automate something you don't understand
+- Pass 2: Can it even be automated?
+  - Packaged software, monolithic packages, Pointy-clicky steps in the middle, undocumented, "Brent"
+  - janky scripts are ok - If you aren't just a little embarrassed by your scripts you probably spent too much time
+- Pass 3: Industrialised automation
+  - Proper automation with tooling
+  - Get things working fast, then refactor
+
+!SLIDE
+
+# tools
+- test-kitchen
+- terraform
+- awspec
+
+!SLIDE
+
+## test kitchen
+
+Test Kitchen is an easily extensible test harness that allows you to test your code written in Terraform, Ansible, Chef, Puppet (and others) on various cloud providers, virtualization providers and operating systems with tests written in a variety of test frameworks.
+
+- Drivers: AWS, Azure, Vagrant, Docker
+
+- Platforms: Linux, Windows
+
+- Provisioners: terraform, chef, puppet, ansible, saltstack
+
+- Test Suites: awspec, inspec, rspec, cucumber,
+
+Enables you to use multiple of these tools
+
+!SLIDE
 ## intro to terraform
 
 - `terraform` is used to build, change, and version infrastructure
@@ -38,12 +122,12 @@
 
 ## intro to awspec
 
-- `terraform` is used to build, change, and version infrastructure
+- `awspec` is RSpec tests for your AWS resources
 - the overall goal is to safety, efficiency and predictability
 - uses a human readable language to improve interpretation of infrastructure config
 - makes reusing and extending existing infrastructure easy
 - all configuration is captured in code
-- `terraform` is open source
+- `awspec` is open source
 
 !SLIDE
 
@@ -53,15 +137,39 @@
 
 !SLIDE
 
-## intro to kitchen
 
-- TBD
+
+## amazing!
+**amazing**
+  əˈmeɪzɪŋ/Submit
+
+_adjective_
+  causing great surprise or wonder; astonishing.
+
+![fit](amazing.jpg)
 
 !SLIDE
 
-## why kitchen
+# kata
+_Code Kata is an attempt to bring this element of practice to software development. A kata is an exercise in karate where you repeat a form many, many times, making little improvements in each. The intent behind code kata is similar._
 
-- TBD
+-- Dave Thomas Code Kata
+
+!SLIDE
+
+## install all the things!
+<img style="float: right;" src="install-all-the-things.jpg">
+
+- `brew install ruby`
+- `brew install ruby-dev`
+- `brew install terraform`
+- `gem install bundler --pre`
+- `gem install test-kitchen`
+- `gem install awsecrets`
+- `gem install awspec`
+
+- AWS credentials
+  - retrieve your `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
 
 !SLIDE
 
@@ -72,6 +180,7 @@
 - awspec
 
 !SLIDE
+
 
 ## terraform config syntax: `general overview`
 
@@ -139,8 +248,6 @@ variable = [{
   - `terraform`
   - `kitchen`
   - `awspec`
-- AWS credentials
-  - retrieve your `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
 
 ### Credentials - Option 1 - .aws/credentials
 - The default location is $HOME/.aws/credentials on Linux and OS X, or "%USERPROFILE%\.aws\credentials" for Windows users.  See http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html

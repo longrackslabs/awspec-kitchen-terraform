@@ -15,7 +15,7 @@
 - To present with `deckrb` please run this command:
 
 ```
-bundle exec deck terraform-deck/01_terraform.md
+bundle exec deck deck/01_awspec_kitchen_terraform.md
 ```
 
 - Once you have the server running go to [localhost:4333](http://localhost:4333) to access the training.
