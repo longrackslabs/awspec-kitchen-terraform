@@ -168,19 +168,23 @@ _Code Kata is an attempt to bring this element of practice to software developme
 - `gem install awsecrets`
 - `gem install awspec`
 
+!SLIDE
+## AWS Setup
 - AWS credentials
   - retrieve your `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
 
+- AMI: Update with AMI for your region
+  - https://aws.amazon.com/amazon-linux-ami/
+
+  `tf/variables.tf`
+
+  ```markup  
+    variable "ami" {
+      default = "ami-ed100689"
+    }
+  ```
+
 !SLIDE
-
-## configuration syntax
-
-- rspec
-- inspec
-- awspec
-
-!SLIDE
-
 
 ## terraform config syntax: `general overview`
 
@@ -225,64 +229,80 @@ variable = [{
   - updates existing resources when allowed
   - recreates existing when updates are not allowed
 
-!SLIDE
-
 ## commands: `bundle exec kitchen verify`
 
-## commands: `bundle exec kitchen destroy`
 
-- destroys all running infrastructure
-- does not touch infrastructure not managed by `terraform`
-
-- note: `kitchen converge` can also remove parts of infrastructure (e.g. if you comment out your code)
 
 !SLIDE
 
-## example: `terraform destroy`
+# exercise 1: Instance size 'micro'
+
+*As a developer, I need my default instance size to be 'micro' so that we can minimize the cost of development machines*
 
 !SLIDE
 
-## prep for lab exercise
+# exercise 1: Write failed test
 
-- make sure you install
-  - `terraform`
-  - `kitchen`
-  - `awspec`
+Write test: `spec/ec2_spec.rb`
 
-### Credentials - Option 1 - .aws/credentials
-- The default location is $HOME/.aws/credentials on Linux and OS X, or "%USERPROFILE%\.aws\credentials" for Windows users.  See http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html
-- When you create an AWS credentials file using the aws configure command, it creates a file with the following format:
-
-```markdown
-[default]
-aws_access_key_id={YOUR_ACCESS_KEY_ID}
-aws_secret_access_key={YOUR_SECRET_ACCESS_KEY}
-
-[profile2]
-aws_access_key_id={YOUR_ACCESS_KEY_ID}
-aws_secret_access_key={YOUR_SECRET_ACCESS_KEY}
-- each example has its own folder... please navigate into each folder to start the exercise
-
+```markdown  
+   its(:instance_type) { should eq 't2.micro' }
 ```
 
-### Credentials Option 2 - direnv / .envars
-- If you are using the [direnv](https://direnv.net/) utility, you should:
-  * create a .envrc file (see .envrc.sample)
-  * run `direnv allow` to set the environment variables
+Test fails:
 
-- TBD
+```markdown
+bundle exec kitchen verify
+ec2 'georgep-ec2'
+  should exist
+  instance_type
+    should eq "t2.micro" (FAILED - 1)
+```
 
 !SLIDE
 
-# exercise 1
+# exercise 1: Implement change and apply
 
-- TBD
+Write code: `tf/main.tf`
+
+```markdown  
+   its(:instance_type) { should eq 't2.micro' }
+```
+
+Apply change:
+
+```markdown
+bundle exec kitchen converge
+
+       aws_instance.server: Modifying... (ID: i-0e8bcc54b897da944)
+         instance_type: "t2.large" => "t2.micro"
+
+       Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+```
+
+!SLIDE
+
+# exercise 1: Test Passes
+
+Test passes:
+
+```markdown
+bundle exec kitchen verify
+ec2 'georgep-ec2'
+  should exist
+  instance_type
+    should eq "t2.micro"
+
+Finished in 0.62976 seconds (files took 1.44 seconds to load)
+2 examples, 0 failures
+```
 
 !SLIDE
 
 # exercise 2
 
 - TBD
+it { should have_tag('Name').value('georgep-ec2') }
 
 !SLIDE
 
@@ -311,5 +331,37 @@ aws_secret_access_key={YOUR_SECRET_ACCESS_KEY}
 !SLIDE
 
 # exercise 7
+
+- TBD
+
+## commands: `bundle exec kitchen destroy`
+
+- destroys all running infrastructure
+- does not touch infrastructure not managed by `terraform`
+
+- note: `kitchen converge` can also remove parts of infrastructure (e.g. if you comment out your code)
+
+!SLIDE
+
+### Credentials - Option 1 - .aws/credentials
+- The default location is $HOME/.aws/credentials on Linux and OS X, or "%USERPROFILE%\.aws\credentials" for Windows users.  See http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html
+- When you create an AWS credentials file using the aws configure command, it creates a file with the following format:
+
+```markdown
+[default]
+aws_access_key_id={YOUR_ACCESS_KEY_ID}
+aws_secret_access_key={YOUR_SECRET_ACCESS_KEY}
+
+[profile2]
+aws_access_key_id={YOUR_ACCESS_KEY_ID}
+aws_secret_access_key={YOUR_SECRET_ACCESS_KEY}
+- each example has its own folder... please navigate into each folder to start the exercise
+
+```
+
+### Credentials Option 2 - direnv / .envars
+- If you are using the [direnv](https://direnv.net/) utility, you should:
+  * create a .envrc file (see .envrc.sample)
+  * run `direnv allow` to set the environment variables
 
 - TBD
