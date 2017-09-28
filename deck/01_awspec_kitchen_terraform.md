@@ -1,52 +1,48 @@
 !SLIDE subsection
 
-# awspec kitchen terraform
+# Test Driven Infrastructure
 
 !SLIDE
 
-# approach
-- infrastructure as code
-- composable toolchain
+# what we are going to cover
 - test driven development
-- red, green, blue
-- three pass automation
+- red, green, blue cycle
+- composable DevOps toolchain
+- infrastructure as code
+- AWS infrastructure kata exercises
 
 !SLIDE
 
-## why infrastructure as code
+# why are we doing this?
+<img style="float: right;" src="saw.jpg">
 
-- provide a codified workflow to create infrastructure
-- expose a workflow for managing updates to existing infrastructure
-- integrate with application code workflows (Git, SCM, code review)
-- provide modular, sharable components for separation of concerns
-- distribution of knowledge, enables self-service (and vacations)
-- build, deploy, run, verify
-
-!SLIDE
-
-## composable toolchain
-<img style="float: right;" src="gears.png">
-
-- A set of specialized tools that can be chained together to form a larger process.
-- We can compose a complete picture by selecting the best tool for each given task in a pipeline.
-- Components can easily be updated or replaced as needed.
-- Easy to adapt processes to changing requirements, without having to retool the entire process.
-- Avoid vendor-lock when something better comes along.
+- Training is a force-multipler. One of us learns, we all can learn
+- As a practice, it is important our skills and capabilities cutting edge
+- Teaching a topic forces you to really know the material
+- Presenting to a group is an important and professional skill
 
 !SLIDE
-
 
 ## test driven development (TDD)
+<img style="float: right;" src="south_park.jpg">
 
-Test-Driven Development (TDD) is a popular software development process that involves writing code in short, repeating development cycles with the goal to enforce good design and enhance confidence.
+Test-Driven Development (TDD) is a popular software development process that involves writing tests and code in short, repeating development cycles with the goal to enforce good design and enhance confidence.
 
-![fit](red-blue-green-recycling-md.png)
+Benefits:
 
-devops.com: https://devops.com/agile-infrastructure-infrastructure-deserves-tests/
+- Acceptance Criteria
+- Focus
+- Cleaner Code
+- Safer Refactoring
+- Fewer Bugs
+- Test Automation
+
+https://www.madetech.com/blog/9-benefits-of-test-driven-development
 
 !SLIDE
 
 ## The Red, Green, Refactor Cycle
+<img style="float: right;" src="red-blue-green-recycling-md.png">
 
 - Red: Write test that fails.
   - Understand the requirements and the state you want to implement. Implement the test, then run your entire test suite. The new test should fail.
@@ -61,31 +57,40 @@ devops.com: https://devops.com/agile-infrastructure-infrastructure-deserves-test
 
 !SLIDE
 
+## why infrastructure as code?
+<img style="float: right;" src="grumpy_cat.jpg">
 
-## Three-pass automation
-<img style="float: right;" src="multi-pass.jpg">
+- provide a codified workflow to create infrastructure
+- expose a workflow for managing updates to existing infrastructure
+- integrate with application code workflows (Git, SCM, code review)
+- provide modular, sharable components for separation of concerns
+- distribution of knowledge, enables self-service (and vacations)
+- test, build, test, deploy, run, verify
 
-- Pass 1: Do we know the steps?
-  - Don't try to automate something you don't understand
-- Pass 2: Can it even be automated?
-  - Packaged software, monolithic packages, Pointy-clicky steps in the middle, undocumented, "Brent"
-  - janky scripts are ok - If you aren't just a little embarrassed by your scripts you probably spent too much time
-- Pass 3: Industrialised automation
-  - Proper automation with tooling
-  - Get things working fast, then refactor
+!SLIDE
+
+## composable toolchain
+<img style="float: right;" src="gears.png">
+
+- A set of specialized tools that can be chained together to form a larger process.
+- We can compose a complete picture by selecting the best tool for each given task in a pipeline.
+- Components can easily be updated or replaced as needed.
+- Easy to adapt processes to changing requirements, without having to retool the entire process.
+- Avoid vendor-lock when something better comes along.
 
 !SLIDE
 
 # tools
-- test-kitchen
-- terraform
-- awspec
+- [test-kitchen](https://docs.chef.io/kitchen.html)
+- [terraform](https://www.terraform.io/)
+- [awspec](https://github.com/k1LoW/awspec)
 
 !SLIDE
 
-## test kitchen
 
-Test Kitchen is an easily extensible test harness that allows you to test your code written in Terraform, Ansible, Chef, Puppet (and others) on various cloud providers, virtualization providers and operating systems with tests written in a variety of test frameworks.
+# kitchen
+
+`kitchen` is an easily extensible test harness that allows you to test your code written in Terraform, Ansible, Chef, Puppet (and others) on various cloud providers, virtualization providers and operating systems with tests written in a variety of test frameworks.
 
 - Drivers: AWS, Azure, Vagrant, Docker
 
@@ -98,46 +103,26 @@ Test Kitchen is an easily extensible test harness that allows you to test your c
 Enables you to use multiple of these tools
 
 !SLIDE
-## intro to terraform
+
+## terraform
 
 - `terraform` is used to build, change, and version infrastructure
 - the overall goal is to safety, efficiency and predictability
 - uses a human readable language to improve interpretation of infrastructure config
 - makes reusing and extending existing infrastructure easy
-- all configuration is captured in code
+- unify the view of resources using infrastructure as code
 - `terraform` is open source
 
 !SLIDE
 
-## why terraform (company goals)
-
-- unify the view of resources using infrastructure as code
-- support the modern data center (IaaS, PaaS, SaaS)
-- expose a way to safely and predictably change infrastructure
-- provide a workflow that is technology agnostic
-- manage anything with an API
-
-
-!SLIDE
-
-## intro to awspec
+# awspec
 
 - `awspec` is RSpec tests for your AWS resources
-- the overall goal is to safety, efficiency and predictability
-- uses a human readable language to improve interpretation of infrastructure config
-- makes reusing and extending existing infrastructure easy
-- all configuration is captured in code
-- `awspec` is open source
+- open-source testing framework for infrastructure with a human-readable language for specifying compliance, security and other policy requirements of AWS infrastructure
+- allows for a rich set of AWS specific testing
+- you can integrate automated tests that check for adherence to requirements & policy into any stage of your deployment pipeline.
 
 !SLIDE
-
-## why awspec
-
-- TBD
-
-!SLIDE
-
-
 
 ## amazing!
 **amazing**
@@ -169,9 +154,19 @@ _Code Kata is an attempt to bring this element of practice to software developme
 - `gem install awspec`
 
 !SLIDE
+
 ## AWS Setup
 - AWS credentials
   - retrieve your `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
+
+  - The default location is $HOME/.aws/credentials on Linux and OS X, or "%USERPROFILE%\.aws\credentials" for Windows users.  See http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html
+
+  ```markdown
+  [default]
+  aws_access_key_id={YOUR_ACCESS_KEY_ID}
+  aws_secret_access_key={YOUR_SECRET_ACCESS_KEY}
+
+  ```
 
 - AMI: Update with AMI for your region
   - https://aws.amazon.com/amazon-linux-ami/
@@ -193,6 +188,7 @@ This is what `terraform's` domain-specific language looks like...
 ```markdown
 variable "ami" {
   description = "the AMI to use"
+  default = "ami-ed100689"
 }
 ```
 
@@ -202,6 +198,7 @@ variable "ami" {
 variable = [{
   "ami": {
     "description": "the AMI to use",
+    "default" : "ami-ed100689"
   }
 }]
 ```
@@ -210,31 +207,236 @@ variable = [{
 
 ## awspec syntax: `test cases`
 
+- awspec is a AWS domain-specific language (DSL)
+- enables the writing of test cases specific to AWS
+- awspec objects map to AWS services and resources
+- written in natural language
+- connects via AWS API's to execute tests
+- integrates with kitchen as a verifier
+
+```json
+describe s3_bucket('my-bucket') do
+  it { should exist }
+end
+```
+
 !SLIDE
 
 ## main commands
-- bundle exec kitchen converge
 - bundle exec kitchen verify
+- bundle exec kitchen converge
 - bundle exec kitchen destroy
-
 
 !SLIDE
 
-## commands: `bundle exec kitchen converge`
+## kitchen.yml
+```markdown
+driver:
+  name: terraform
+  directory: tf
+  variables:
+    access_key: <%= ENV['AWS_ACCESS_KEY_ID'] %>
+    secret_key: <%= ENV['AWS_SECRET_ACCESS_KEY'] %>
+
+provisioner:
+  name: terraform
+
+platforms:
+  - name: aws
+
+verifier:
+  name: awspec
+
+suites:
+  - name: default
+    verifier:
+      patterns:
+      - spec/*_spec.rb
+```
+
+!SLIDE
+
+## `bundle exec kitchen verify`
+- run tests against AWS infrastructure
+- reports success & fail and details
+
+```markdown
+$ bundle exec kitchen converge
+
+vpc 'my-vpc'
+  should exist
+  cidr_block
+    should eq "10.0.0.0/16"
+
+security_group 'my-security-group'
+  should exist
+  inbound
+    should be opened 8080
+
+ec2 'my-ec2'
+  should exist
+  should have tag "Name"
+  should have security group "my-security-group" (FAILED - 1)
+  should belong to vpc "my-vpc" (FAILED - 2)
+  instance_type
+    should eq "t2.micro"
+```
+
+!SLIDE
+
+## `bundle exec kitchen converge`
 
 - execute changes to reach the desired state
 - parallelizes changes wherever possible
 - handles and recovers from transient errors safely
 - moves from a current state to target state (delta approach)
-  - updates existing resources when allowed
-  - recreates existing when updates are not allowed
-
-## commands: `bundle exec kitchen verify`
-
-
+- updates existing resources when allowed
+- recreates existing when updates are not allowed
 
 !SLIDE
 
+# exercises
+
+- VPC
+- VPC w/CIDR block
+- Security Group
+- Basic EC2 instance
+- EC2 with security group & vpc
+
+!SLIDE
+
+# exercise : Write Test: VPC with CIDR block
+
+```markdown
+spec/vpc_spec.rb:
+
+describe vpc('my-vpc') do
+  it { should exist }
+  its(:cidr_block) { should eq '10.0.0.0/16' }
+end
+```
+
+!SLIDE
+
+# exercise : Test Fails: VPC with CIDR block
+
+```markdown
+
+ > bundle exec kitchen verify
+
+vpc 'my-vpc'
+  should exist (FAILED - 1)
+  cidr_block
+    example at ./spec/vpc_spec.rb:5 (FAILED - 2)
+```
+
+!SLIDE
+
+# exercise : Write Code: VPC with CIDR block
+
+```markdown
+resource "aws_vpc" "my-vpc" {
+  cidr_block       = "10.0.0.0/16"
+
+  tags {
+    Name = "my-vpc"
+  }
+}
+
+  > bundle exec kitchen converge
+
+```
+
+!SLIDE
+
+# exercise : Test Passes: VPC with CIDR block
+
+```markdown
+  > bundle exec kitchen verify
+
+vpc 'my-vpc'
+  should exist
+  cidr_block
+    should eq "10.0.0.0/16"
+
+Finished in 0.93456 seconds (files took 1.44 seconds to load)
+2 examples, 0 failures
+```
+
+!SLIDE
+
+# exercise 4: Create a security group for tcp port 8080
+
+- test
+  - security group
+
+- test
+
+!SLIDE
+# exercise 4: Create a security group for tcp port 8080
+
+- test
+  - security group
+
+  ```markdown
+  describe security_group('my-security-group-name') do
+    it { should exist }
+    its(:inbound) { should be_opened(8080).protocol('tcp') }
+  end
+  ```
+  - ec2:
+
+  ```markdown
+    it { should have_security_group('my-security-group-name') }
+  ```
+
+- terraform code
+
+```markdown
+resource "aws_security_group" "instance" {
+  name = "my-security-group-name"
+  ingress {
+    from_port = 8080
+    to_port = 8080
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+```
+
+!SLIDE
+
+# exercise 5: Create an autoscaling-groups
+
+- Test
+
+- Code
+```markdown
+resource "aws_autoscaling_group" "example" {
+  launch_configuration = "${aws_launch_configuration.example.id}"
+  min_size = 2
+  max_size = 10
+  tag {
+    key = "Name"
+    value = "terraform-asg-example"
+    propagate_at_launch = true
+  }
+}
+```
+
+- TBD
+
+!SLIDE
+
+# exercise 6
+
+- TBD
+
+!SLIDE
+
+# exercise 7
+
+- TBD
 # exercise 1: Instance size 'micro'
 
 *As a developer, I need my default instance size to be 'micro' so that we can minimize the cost of development machines*
@@ -299,40 +501,39 @@ Finished in 0.62976 seconds (files took 1.44 seconds to load)
 
 !SLIDE
 
-# exercise 2
+# exercise 2: Tag instance with Name
 
-- TBD
-it { should have_tag('Name').value('georgep-ec2') }
+- Write Test
 
-!SLIDE
+```markdown
+  it { should have_tag('Name').value('georgep-ec2') }
+```
 
-# exercise 3
+- Write Code
 
-- TBD
-
-!SLIDE
-
-# exercise 4
-
-- TBD
-
-!SLIDE
-
-# exercise 5
-
-- TBD
+```markdown
+tags {
+  Name = "georgep-ec2"
+}
+```
 
 !SLIDE
 
-# exercise 6
+# exercise 2: Tag instance with Name
 
-- TBD
+- Apply
+
+```markdown
+bundle exec kitchen converge
+```
+
+- Verify
+
+```markdown
+bundle exec kitchen converge
+```
 
 !SLIDE
-
-# exercise 7
-
-- TBD
 
 ## commands: `bundle exec kitchen destroy`
 
@@ -351,11 +552,6 @@ it { should have_tag('Name').value('georgep-ec2') }
 [default]
 aws_access_key_id={YOUR_ACCESS_KEY_ID}
 aws_secret_access_key={YOUR_SECRET_ACCESS_KEY}
-
-[profile2]
-aws_access_key_id={YOUR_ACCESS_KEY_ID}
-aws_secret_access_key={YOUR_SECRET_ACCESS_KEY}
-- each example has its own folder... please navigate into each folder to start the exercise
 
 ```
 

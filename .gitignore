@@ -28,3 +28,4 @@ tmp
 .kitchen.local.yml
 Berksfile.lock
 .envrc
+terraform.tfstate
