@@ -1,0 +1,23 @@
+require './spec/spec_helper'
+
+# Exercise #1: VPC
+describe vpc('my-vpc') do
+  it { should exist }
+
+  # Exercise #2: VPC w/CIDR Block
+  its(:cidr_block) { should eq '10.0.0.0/16' }
+end
+
+describe security_group('my-security-group') do
+  it { should exist }
+  its(:inbound) { should be_opened(8080).protocol('tcp') }
+end
+
+describe ec2('my-server') do
+  it { should exist }
+  its(:instance_type) { should eq 't2.micro' }
+  it { should have_tag('Name').value('my-server') }
+
+  it { should have_security_group('my-security-group') }
+  it { should belong_to_vpc('my-vpc') }
+end

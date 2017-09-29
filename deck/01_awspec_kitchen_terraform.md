@@ -300,8 +300,7 @@ ec2 'my-ec2'
 - VPC
 - VPC w/CIDR block
 - Security Group
-- Basic EC2 instance
-- EC2 with security group & vpc
+- EC2 with name, security group & vpc
 
 !SLIDE
 
@@ -316,13 +315,14 @@ describe vpc('my-vpc') do
 end
 ```
 
+[awspec:vpc](https://github.com/k1LoW/awspec/blob/master/doc/resource_types.md#vpc)
 !SLIDE
 
 # exercise : Test Fails: VPC with CIDR block
 
 ```markdown
 
- > bundle exec kitchen verify
+$ bundle exec kitchen verify
 
 vpc 'my-vpc'
   should exist (FAILED - 1)
@@ -346,6 +346,7 @@ resource "aws_vpc" "my-vpc" {
   > bundle exec kitchen converge
 
 ```
+[terraform:aws_vpc](https://www.terraform.io/docs/providers/aws/d/vpc.html)
 
 !SLIDE
 
