@@ -298,13 +298,13 @@ ec2 'my-ec2'
 # exercises
 
 - VPC
-- VPC w/CIDR block
+- Subnet
 - Security Group
 - EC2 with name, security group & vpc
 
 !SLIDE
 
-# exercise : Write Test: VPC with CIDR block
+# exercise : vpc : write test
 
 ```markdown
 spec/vpc_spec.rb:
@@ -318,7 +318,7 @@ end
 [awspec:vpc](https://github.com/k1LoW/awspec/blob/master/doc/resource_types.md#vpc)
 !SLIDE
 
-# exercise : Test Fails: VPC with CIDR block
+# exercise : vpc : test fails
 
 ```markdown
 
@@ -327,12 +327,34 @@ $ bundle exec kitchen verify
 vpc 'my-vpc'
   should exist (FAILED - 1)
   cidr_block
-    example at ./spec/vpc_spec.rb:5 (FAILED - 2)
+    example at ./spec/exercises_spec.rb:6 (FAILED - 2)
+
+Failures:
+
+  1) vpc 'my-vpc' should exist
+     Failure/Error: it { should exist }
+       expected vpc 'my-vpc' to exist
+     # ./spec/exercises_spec.rb:5:in `block (2 levels) in <top (required)>'
+
+  2) vpc 'my-vpc' cidr_block
+     Failure/Error: its(:cidr_block) { should eq '10.0.0.0/16' }
+
+     ArgumentError:
+       missing required option :id
+     # ./spec/exercises_spec.rb:6:in `block (2 levels) in <top (required)>'
+
+Finished in 0.7115 seconds (files took 1.36 seconds to load)
+2 examples, 2 failures
+
+Failed examples:
+
+rspec ./spec/exercises_spec.rb:5 # vpc 'my-vpc' should exist
+rspec ./spec/exercises_spec.rb:6 # vpc 'my-vpc' cidr_block
 ```
 
 !SLIDE
 
-# exercise : Write Code: VPC with CIDR block
+# exercise : vcp : write code
 
 ```markdown
 resource "aws_vpc" "my-vpc" {
@@ -343,17 +365,20 @@ resource "aws_vpc" "my-vpc" {
   }
 }
 
-  > bundle exec kitchen converge
-
+$ bundle exec kitchen converge
+...
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+Finished converging <default-aws> (0m15.13s).
 ```
+
 [terraform:aws_vpc](https://www.terraform.io/docs/providers/aws/d/vpc.html)
 
 !SLIDE
 
-# exercise : Test Passes: VPC with CIDR block
+# exercise : vpc : test passes
 
 ```markdown
-  > bundle exec kitchen verify
+$ bundle exec kitchen verify
 
 vpc 'my-vpc'
   should exist
@@ -366,7 +391,64 @@ Finished in 0.93456 seconds (files took 1.44 seconds to load)
 
 !SLIDE
 
-# exercise 4: Create a security group for tcp port 8080
+# exercise : subnet
+Create a subnet with a Name tag and CIDR block 10.0.1.0/24
+
+!SLIDE
+
+# exercise : subnet : write test
+```markdown
+describe subnet('my-subnet') do
+  it { should exist }
+  its(:cidr_block) { should eq '10.0.1.0/24' }
+end
+```
+
+!SLIDE
+# exercise : subnet test fails
+```
+$ bundle exec kitchen verify
+vpc 'my-vpc'
+  should exist
+  cidr_block
+    should eq "10.0.0.0/16"
+
+subnet 'my-subnet'
+  should exist (FAILED - 1)
+  cidr_block
+    example at ./spec/exercises_spec.rb:11 (FAILED - 2)
+
+Failures:
+
+  1) subnet 'my-subnet' should exist
+     Failure/Error: it { should exist }
+       expected subnet 'my-subnet' to exist
+     # ./spec/exercises_spec.rb:10:in `block (2 levels) in <top (required)>'
+
+  2) subnet 'my-subnet' cidr_block
+     Failure/Error: its(:cidr_block) { should eq '10.0.1.0/24' }
+
+     ArgumentError:
+       missing required option :id
+     # ./spec/exercises_spec.rb:11:in `block (2 levels) in <top (required)>'
+
+Finished in 0.96648 seconds (files took 1.39 seconds to load)
+4 examples, 2 failures
+```
+!SLIDE
+
+vpc 'my-vpc'
+  should exist
+  cidr_block
+    should eq "10.0.0.0/16"
+
+subnet 'my-subnet'
+  should exist
+
+Finished in 0.6117 seconds (files took 1.36 seconds to load)
+3 examples, 0 failures
+
+# exercise : Create a security group for tcp port 8080
 
 - test
   - security group
