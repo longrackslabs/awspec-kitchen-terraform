@@ -357,6 +357,8 @@ rspec ./spec/exercises_spec.rb:6 # vpc 'my-vpc' cidr_block
 # exercise : vcp : write code
 
 ```markdown
+tf/main.tf:
+
 resource "aws_vpc" "my-vpc" {
   cidr_block       = "10.0.0.0/16"
 
@@ -395,8 +397,8 @@ Finished in 0.93456 seconds (files took 1.44 seconds to load)
 Create a subnet with a Name tag and CIDR block 10.0.1.0/24
 
 !SLIDE
-
 # exercise : subnet : write test
+
 ```markdown
 describe subnet('my-subnet') do
   it { should exist }
@@ -435,8 +437,46 @@ Failures:
 Finished in 0.96648 seconds (files took 1.39 seconds to load)
 4 examples, 2 failures
 ```
-!SLIDE
 
+!SLIDE
+# exercise : subnet write code
+
+```markdown
+tf/main.tf
+
+resource "aws_subnet" "subnet" {
+  vpc_id     = "${aws_vpc.vpc.id}"
+  cidr_block = "10.0.1.0/24"
+
+  tags {
+    Name = "my-subnet"
+  }
+}
+```
+
+```markdown
+$ bundle exec kitchen converge
+...
+aws_vpc.vpc: Refreshing state... (ID: vpc-b2b5cddb)
+aws_subnet.subnet: Creating...
+  assign_ipv6_address_on_creation: "" => "false"
+  availability_zone:               "" => "<computed>"
+  cidr_block:                      "" => "10.0.1.0/24"
+  ipv6_cidr_block:                 "" => "<computed>"
+  ipv6_cidr_block_association_id:  "" => "<computed>"
+  map_public_ip_on_launch:         "" => "false"
+  tags.%:                          "" => "1"
+  tags.Name:                       "" => "my-subnet"
+  vpc_id:                          "" => "vpc-b2b5cddb"
+aws_subnet.subnet: Creation complete after 5s (ID: subnet-e9c7b392)
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+```
+
+!SLIDE
+# exercise : subnet : test passes
+
+```markdown
 vpc 'my-vpc'
   should exist
   cidr_block
@@ -444,9 +484,18 @@ vpc 'my-vpc'
 
 subnet 'my-subnet'
   should exist
+  cidr_block
+    should eq "10.0.1.0/24"
 
-Finished in 0.6117 seconds (files took 1.36 seconds to load)
-3 examples, 0 failures
+Finished in 2.51 seconds (files took 1.39 seconds to load)
+4 examples, 0 failures
+
+       Finished verifying <default-aws> (0m5.65s).
+-----> Kitchen is finished. (0m5.99s)
+```
+
+
+!SLIDE
 
 # exercise : Create a security group for tcp port 8080
 
