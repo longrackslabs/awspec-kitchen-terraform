@@ -4,7 +4,7 @@
 - An introduction to the basics of terraform
 - An AWS lab to get you familiar with syntax and features
 
-## Prerequisites (not complete - please update/fix)
+## Prerequisites
 - `brew install ruby`
 - `brew install ruby-dev`
 - `brew install terraform`
