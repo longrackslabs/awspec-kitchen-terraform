@@ -1058,6 +1058,9 @@ Finished destroying <default-aws> (1m37.10s).
 
 !SLIDE
 ## cleanup : all tests fail
+<img style="float: right;" src="picard-facepalm.jpg">
+
+this.did.not.do.what.i.expected
 
 !SLIDE
 ## Console : EC2 terminated
