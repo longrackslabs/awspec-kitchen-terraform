@@ -81,7 +81,7 @@ devops.com: https://devops.com/agile-infrastructure-infrastructure-deserves-test
 !SLIDE
 
 # tools
-- [test-kitchen](https://docs.chef.io/kitchen.html)
+- [kitchen](https://docs.chef.io/kitchen.html)
 - [terraform](https://www.terraform.io/)
 - [awspec](https://github.com/k1LoW/awspec)
 
@@ -222,7 +222,8 @@ end
 
 !SLIDE
 
-## main commands
+## kitchen config & commands
+- kitchen.yml
 - bundle exec kitchen verify
 - bundle exec kitchen converge
 - bundle exec kitchen destroy
@@ -329,23 +330,6 @@ vpc 'my-vpc'
   cidr_block
     example at ./spec/exercises_spec.rb:6 (FAILED - 2)
 
-Failures:
-
-  1) vpc 'my-vpc' should exist
-     Failure/Error: it { should exist }
-       expected vpc 'my-vpc' to exist
-     # ./spec/exercises_spec.rb:5:in `block (2 levels) in <top (required)>'
-
-  2) vpc 'my-vpc' cidr_block
-     Failure/Error: its(:cidr_block) { should eq '10.0.0.0/16' }
-
-     ArgumentError:
-       missing required option :id
-     # ./spec/exercises_spec.rb:6:in `block (2 levels) in <top (required)>'
-
-Finished in 0.7115 seconds (files took 1.36 seconds to load)
-2 examples, 2 failures
-
 Failed examples:
 
 rspec ./spec/exercises_spec.rb:5 # vpc 'my-vpc' should exist
@@ -420,20 +404,6 @@ subnet 'my-subnet'
   cidr_block
     example at ./spec/exercises_spec.rb:11 (FAILED - 2)
 
-Failures:
-
-  1) subnet 'my-subnet' should exist
-     Failure/Error: it { should exist }
-       expected subnet 'my-subnet' to exist
-     # ./spec/exercises_spec.rb:10:in `block (2 levels) in <top (required)>'
-
-  2) subnet 'my-subnet' cidr_block
-     Failure/Error: its(:cidr_block) { should eq '10.0.1.0/24' }
-
-     ArgumentError:
-       missing required option :id
-     # ./spec/exercises_spec.rb:11:in `block (2 levels) in <top (required)>'
-
 Finished in 0.96648 seconds (files took 1.39 seconds to load)
 4 examples, 2 failures
 ```
@@ -496,187 +466,610 @@ Finished in 2.51 seconds (files took 1.39 seconds to load)
 
 
 !SLIDE
+## exercise : security group : requirements
+- Create a security group with Name tag
+- Add ingress rules for tcp port 8080
+- Associate security group with vpc
 
-# exercise : Create a security group for tcp port 8080
+[awspec:security_group](https://github.com/k1LoW/awspec/blob/master/doc/resource_types.md#security_group)
 
-- test
-  - security group
+[awspec:its](https://github.com/k1LoW/awspec/blob/master/doc/resource_types.md#itsinbound-itsoutbound)
 
-- test
+[terraform:aws_security_group](https://www.terraform.io/docs/providers/aws/d/security_group.html)
 
 !SLIDE
-# exercise 4: Create a security group for tcp port 8080
-
-- test
-  - security group
-
-  ```markdown
-  describe security_group('my-security-group-name') do
-    it { should exist }
-    its(:inbound) { should be_opened(8080).protocol('tcp') }
-  end
-  ```
-  - ec2:
-
-  ```markdown
-    it { should have_security_group('my-security-group-name') }
-  ```
-
-- terraform code
+## exercise : security group : exists, Name tag : write test
 
 ```markdown
-resource "aws_security_group" "instance" {
-  name = "my-security-group-name"
+describe security_group('my-security-group') do
+  it { should exist }
+  it { should have_tag('Name').value('my-security-group') }
+end
+```
+
+!SLIDE
+## exercise : security group : exists, Name tag : test fails
+
+```
+$ bundle exec kitchen verify
+vpc 'my-vpc'
+  should exist
+  cidr_block
+    should eq "10.0.0.0/16"
+
+subnet 'my-subnet'
+  should exist
+  cidr_block
+    should eq "10.0.1.0/24"
+
+security_group 'my-security-group'
+  should exist (FAILED - 1)
+  should have tag "Name" (FAILED - 2)
+
+Failed examples:
+
+rspec ./spec/exercises_spec.rb:16 # security_group 'my-security-group' should exist
+rspec ./spec/exercises_spec.rb:17 # security_group 'my-security-group' should have tag "Name"
+```
+
+!SLIDE
+## exercise : security group : exists, Name tag : write code
+
+```
+tf/main.tf
+
+resource "aws_security_group" "sg" {
+  name = "my-security-group"
+
+  tags {
+    Name = "my-security-group"
+  }
+}
+```
+
+```
+$ bundle exec kitchen converge
+...
+
+aws_security_group.sg: Creating...
+  description: "" => "Managed by Terraform"
+  egress.#:    "" => "<computed>"
+  ingress.#:   "" => "<computed>"
+  name:        "" => "my-security-group"
+  owner_id:    "" => "<computed>"
+  tags.%:      "" => "1"
+  tags.Name:   "" => "my-security-group"
+  vpc_id:      "" => "<computed>"
+aws_security_group.sg: Creation complete after 0s (ID: sg-1747a27f)
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+```
+
+!SLIDE
+## exercise : security group : exists, Name : test passes
+
+```
+$ bundle exec kitchen verifying
+...
+security_group 'my-security-group'
+  should exist
+  should have tag "Name"
+
+Finished in 0.50802 seconds (files took 1.35 seconds to load)
+6 examples, 0 failures
+
+       Finished verifying <default-aws> (0m3.65s).
+-----> Kitchen is finished. (0m4.00s)
+```
+
+!SLIDE
+## exercise : security group : ingress rules : write test
+
+```
+markdown
+describe security_group('my-security-group') do
+  it { should exist }
+  it { should have_tag('Name').value('my-security-group') }
+  its(:inbound) { should be_opened(8080).protocol('tcp') }
+end
+```
+
+!SLIDE
+## exercise : security group : ingress rules : test fails
+
+```markdown
+$ bundle exec kitchen verify
+...
+
+security_group 'my-security-group'
+  should exist
+  should have tag "Name"
+  inbound
+    should be opened 8080 (FAILED - 1)
+
+Failed examples:
+
+rspec ./spec/exercises_spec.rb:18 # security_group 'my-security-group' inbound should be opened 8080
+```
+
+!SLIDE
+## exercise : security group : ingress rules: write code
+
+```markdown
+tf/main.tf
+
+resource "aws_security_group" "sg" {
+  name = "my-security-group"
+
+  tags {
+    Name = "my-security-group"
+  }
+
   ingress {
     from_port = 8080
     to_port = 8080
     protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["10.0.0.0/16"]
   }
 }
 ```
 
-!SLIDE
-
-# exercise 5: Create an autoscaling-groups
-
-- Test
-
-- Code
 ```markdown
-resource "aws_autoscaling_group" "example" {
-  launch_configuration = "${aws_launch_configuration.example.id}"
-  min_size = 2
-  max_size = 10
-  tag {
-    key = "Name"
-    value = "terraform-asg-example"
-    propagate_at_launch = true
-  }
-}
+$ bundle exec kitchen converge
+...
+
+aws_security_group.sg: Modifying... (ID: sg-1747a27f)
+  ingress.#:                            "0" => "1"
+  ingress.542945394.cidr_blocks.#:      "0" => "1"
+  ingress.542945394.cidr_blocks.0:      "" => "10.0.0.0/16"
+  ingress.542945394.from_port:          "" => "8080"
+  ingress.542945394.ipv6_cidr_blocks.#: "0" => "0"
+  ingress.542945394.protocol:           "" => "tcp"
+  ingress.542945394.security_groups.#:  "0" => "0"
+  ingress.542945394.self:               "" => "false"
+  ingress.542945394.to_port:            "" => "8080"
+aws_security_group.sg: Modifications complete after 0s (ID: sg-1747a27f)
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
 ```
 
-- TBD
-
 !SLIDE
-
-# exercise 6
-
-- TBD
-
-!SLIDE
-
-# exercise 7
-
-- TBD
-# exercise 1: Instance size 'micro'
-
-*As a developer, I need my default instance size to be 'micro' so that we can minimize the cost of development machines*
-
-!SLIDE
-
-# exercise 1: Write failed test
-
-Write test: `spec/ec2_spec.rb`
-
-```markdown  
-   its(:instance_type) { should eq 't2.micro' }
-```
-
-Test fails:
+## exercise : security group : ingress rules: test passes
 
 ```markdown
-bundle exec kitchen verify
-ec2 'georgep-ec2'
+$ bundle exec kitchen verify
+...
+
+vpc 'my-vpc'
   should exist
+  cidr_block
+    should eq "10.0.0.0/16"
+
+subnet 'my-subnet'
+  should exist
+  cidr_block
+    should eq "10.0.1.0/24"
+
+security_group 'my-security-group'
+  should exist
+  should have tag "Name"
+  inbound
+    should be opened 8080
+
+Finished in 3.07 seconds (files took 1.39 seconds to load)
+7 examples, 0 failures
+
+       Finished verifying <default-aws> (0m6.25s).
+-----> Kitchen is finished. (0m6.72s)
+```
+
+!SLIDE
+## exercise : security group : vpc : write test
+
+```markdown
+describe security_group('my-security-group') do
+  it { should exist }
+  it { should have_tag('Name').value('my-security-group') }
+  its(:inbound) { should be_opened(8080).protocol('tcp') }
+  it { should belong_to_vpc('my-vpc') }
+end
+```
+
+!SLIDE
+## exercise : security group : vpc : test fails
+
+```markdown
+$ bundle exec kitchen verify
+...
+security_group 'my-security-group'
+  should exist
+  should have tag "Name"
+  inbound
+    should be opened 8080
+  should belong to vpc "my-vpc" (FAILED - 1)
+
+Failed examples:
+
+rspec ./spec/exercises_spec.rb:19 # security_group 'my-security-group' should belong to vpc "my-vpc"
+```
+!SLIDE
+## exercise : security group : vpc : write code
+
+```
+tf/main.tf
+
+resource "aws_security_group" "sg" {
+  name = "my-security-group"
+
+  tags {
+    Name = "my-security-group"
+  }
+
+  ingress {
+    from_port = 8080
+    to_port = 8080
+    protocol = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
+
+  vpc_id = "${aws_vpc.vpc.id}"
+}
+```
+
+```
+$ bundle exec kitchen converge
+...
+aws_security_group.sg: Creating...
+  description:                          "" => "Managed by Terraform"
+  egress.#:                             "" => "<computed>"
+  ingress.#:                            "" => "1"
+  ingress.542945394.cidr_blocks.#:      "" => "1"
+  ingress.542945394.cidr_blocks.0:      "" => "10.0.0.0/16"
+  ingress.542945394.from_port:          "" => "8080"
+  ingress.542945394.ipv6_cidr_blocks.#: "" => "0"
+  ingress.542945394.protocol:           "" => "tcp"
+  ingress.542945394.security_groups.#:  "" => "0"
+  ingress.542945394.self:               "" => "false"
+  ingress.542945394.to_port:            "" => "8080"
+  name:                                 "" => "my-security-group"
+  owner_id:                             "" => "<computed>"
+  tags.%:                               "" => "1"
+  tags.Name:                            "" => "my-security-group"
+  vpc_id:                               "" => "vpc-e2682d8b"
+aws_security_group.sg: Creation complete after 2s (ID: sg-3aaf4b52)
+```
+
+!SLIDE
+## exercise : security group : vpc : test passes  
+
+```markdown
+
+$ bundle exec kitchen verify
+...
+
+vpc 'my-vpc'
+  should exist
+  cidr_block
+    should eq "10.0.0.0/16"
+
+subnet 'my-subnet'
+  should exist
+  cidr_block
+    should eq "10.0.1.0/24"
+
+security_group 'my-security-group'
+  should exist
+  should have tag "Name"
+  should belong to vpc "my-vpc"
+  inbound
+    should be opened 8080
+
+Finished in 1.2 seconds (files took 1.43 seconds to load)
+8 examples, 0 failures
+
+-----> Kitchen is finished. (0m4.96s)
+```
+
+!SLIDE
+## exercise : ec2 instance : requirements
+
+- exists
+- is running
+- using correct AMI
+- is type t2.micro
+- has a Name tag and set
+- has security group
+- belongs to vpc
+- belong to subnet
+
+[awspec:ec2](https://github.com/k1LoW/awspec/blob/master/doc/resource_types.md#ec2)
+
+[terraform:instance](https://www.terraform.io/docs/providers/aws/d/instance.html)
+
+!SLIDE
+## exercise : ec2 instance : write test
+
+```markdown
+describe ec2('my-server') do
+  it { should exist }
+  it { should be_running }
+  its(:image_id) { should eq 'ami-ed100689' }
+  its(:instance_type) { should eq 't2.micro' }
+  it { should have_tag('Name').value('my-server') }
+  it { should have_security_group('my-security-group') }
+  it { should belong_to_vpc('my-vpc') }
+  it { should belong_to_subnet('my-subnet') }
+end
+```
+
+!SLIDE
+## exercise : ec2 : test fails
+
+```markdown
+$ bundle exec kitchen verify
+ec2 'my-server'
+  should exist (FAILED - 1)
+  should be running (FAILED - 2)
+  should have tag "Name" (FAILED - 3)
+  should have security group "my-security-group" (FAILED - 4)
+  should belong to vpc "my-vpc" (FAILED - 5)
+  should belong to subnet "my-subnet" (FAILED - 6)
+  image_id
+    example at ./spec/exercises_spec.rb:25 (FAILED - 7)
   instance_type
-    should eq "t2.micro" (FAILED - 1)
+    example at ./spec/exercises_spec.rb:26 (FAILED - 8)
+
+Failed examples:
+
+rspec ./spec/exercises_spec.rb:23 # ec2 'my-server' should exist
+rspec ./spec/exercises_spec.rb:24 # ec2 'my-server' should be running
+rspec ./spec/exercises_spec.rb:27 # ec2 'my-server' should have tag "Name"
+rspec ./spec/exercises_spec.rb:28 # ec2 'my-server' should have security group "my-security-group"
+rspec ./spec/exercises_spec.rb:29 # ec2 'my-server' should belong to vpc "my-vpc"
+rspec ./spec/exercises_spec.rb:30 # ec2 'my-server' should belong to subnet "my-subnet"
+rspec ./spec/exercises_spec.rb:25 # ec2 'my-server' image_id
+rspec ./spec/exercises_spec.rb:26 # ec2 'my-server' instance_type
+
+!SLIDE
+## exercise : ec2 : write code
+
+```markdown
+resource "aws_instance" "server" {
+  ami = "${var.ami}"
+  instance_type = "t2.micro"
+
+  tags {
+    Name = "my-server"
+  }
+
+  security_groups = ["${aws_security_group.sg.id}"]
+  subnet_id = "${aws_subnet.subnet.id}"
+}
+```
+
+```markdown
+$ bundle exec kitchen converge
+aws_instance.server: Creating...
+  ami:                          "" => "ami-ed100689"
+  associate_public_ip_address:  "" => "<computed>"
+  availability_zone:            "" => "<computed>"
+  ebs_block_device.#:           "" => "<computed>"
+  ephemeral_block_device.#:     "" => "<computed>"
+  instance_state:               "" => "<computed>"
+  instance_type:                "" => "t2.micro"
+  ipv6_address_count:           "" => "<computed>"
+  ipv6_addresses.#:             "" => "<computed>"
+  key_name:                     "" => "<computed>"
+  network_interface.#:          "" => "<computed>"
+  network_interface_id:         "" => "<computed>"
+  placement_group:              "" => "<computed>"
+  primary_network_interface_id: "" => "<computed>"
+  private_dns:                  "" => "<computed>"
+  private_ip:                   "" => "<computed>"
+  public_dns:                   "" => "<computed>"
+  public_ip:                    "" => "<computed>"
+  root_block_device.#:          "" => "<computed>"
+  security_groups.#:            "" => "1"
+  security_groups.3781644720:   "" => "sg-3aaf4b52"
+  source_dest_check:            "" => "true"
+  subnet_id:                    "" => "subnet-1e592e65"
+  tags.%:                       "" => "1"
+  tags.Name:                    "" => "my-server-02"
+  tenancy:                      "" => "<computed>"
+  volume_tags.%:                "" => "<computed>"
+  vpc_security_group_ids.#:     "" => "<computed>"
+aws_instance.server: Still creating... (10s elapsed)
+aws_instance.server: Still creating... (20s elapsed)
+aws_instance.server: Creation complete after 26s (ID: i-053a62d76234acfac)
+
+Apply complete! Resources: 1 added, 0 changed, 1 destroyed.
 ```
 
 !SLIDE
-
-# exercise 1: Implement change and apply
-
-Write code: `tf/main.tf`
-
-```markdown  
-   its(:instance_type) { should eq 't2.micro' }
-```
-
-Apply change:
+## exercise : ec2 : tests pass
 
 ```markdown
-bundle exec kitchen converge
-
-       aws_instance.server: Modifying... (ID: i-0e8bcc54b897da944)
-         instance_type: "t2.large" => "t2.micro"
-
-       Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
-```
-
-!SLIDE
-
-# exercise 1: Test Passes
-
-Test passes:
-
-```markdown
-bundle exec kitchen verify
-ec2 'georgep-ec2'
+$ bundle exec kitchen verify
+...
+ec2 'my-server-02'
   should exist
+  should be running
+  should have tag "Name"
+  should have security group "my-security-group"
+  should belong to vpc "my-vpc"
+  should belong to subnet "my-subnet"
+  image_id
+    should eq "ami-ed100689"
   instance_type
     should eq "t2.micro"
 
-Finished in 0.62976 seconds (files took 1.44 seconds to load)
-2 examples, 0 failures
+Finished in 0.96834 seconds (files took 1.44 seconds to load)
 ```
 
 !SLIDE
-
-# exercise 2: Tag instance with Name
-
-- Write Test
-
+## Final tests
 ```markdown
-  it { should have_tag('Name').value('georgep-ec2') }
+require './spec/spec_helper'
+
+describe vpc('my-vpc') do
+  it { should exist }
+  its(:cidr_block) { should eq '10.0.0.0/16' }
+end
+
+describe subnet('my-subnet') do
+  it { should exist }
+  its(:cidr_block) { should eq '10.0.1.0/24' }
+end
+
+describe security_group('my-security-group') do
+  it { should exist }
+  it { should have_tag('Name').value('my-security-group') }
+  its(:inbound) { should be_opened(8080).protocol('tcp') }
+  it { should belong_to_vpc('my-vpc') }
+end
+
+describe ec2('my-server-02') do
+  it { should exist }
+  it { should be_running }
+  its(:image_id) { should eq 'ami-ed100689' }
+  its(:instance_type) { should eq 't2.micro' }
+  it { should have_tag('Name').value('my-server-02') }
+  it { should have_security_group('my-security-group') }
+  it { should belong_to_vpc('my-vpc') }
+  it { should belong_to_subnet('my-subnet') }
+end
 ```
 
-- Write Code
+!SLIDE
+## Final Code
+
 
 ```markdown
-tags {
-  Name = "georgep-ec2"
+tf/main.tf
+
+provider "aws" {
+  access_key = "${var.access_key}"
+  secret_key = "${var.secret_key}"
+  region = "${var.region}"
+}
+
+resource "aws_vpc" "vpc" {
+  cidr_block       = "10.0.0.0/16"
+
+  tags {
+    Name = "my-vpc"
+  }
+}
+
+resource "aws_subnet" "subnet" {
+  vpc_id     = "${aws_vpc.vpc.id}"
+  cidr_block = "10.0.1.0/24"
+
+  tags {
+    Name = "my-subnet"
+  }
+}
+
+resource "aws_security_group" "sg" {
+  name = "my-security-group"
+
+  tags {
+    Name = "my-security-group"
+  }
+
+  ingress {
+    from_port = 8080
+    to_port = 8080
+    protocol = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
+
+  vpc_id = "${aws_vpc.vpc.id}"
+}
+
+resource "aws_instance" "server" {
+  ami = "${var.ami}"
+  instance_type = "t2.micro"
+
+  tags {
+    Name = "my-server-02"
+  }
+
+  security_groups = ["${aws_security_group.sg.id}"]
+  subnet_id = "${aws_subnet.subnet.id}"
 }
 ```
 
 !SLIDE
+## AWS Console : vpc
 
-# exercise 2: Tag instance with Name
+<img src="console_vpc.png">
 
-- Apply
+!SLIDE
+## AWS Console : subnet
+<img src="console_subnet.png">
+
+!SLIDE
+## AWS Console : security group
+<img src="console_security_group.png">
+<img src="console_ingress.png">
+
+!SLIDE
+## AWS Console : ec2 instance
+<img src="console_ec2.png">
+
+
+!SLIDE
+# Teardown & Cleanup
+<img style="float: right;" src="burn-it-down.png">
+
+!SLIDE
+## kitchen destroy
 
 ```markdown
-bundle exec kitchen converge
-```
+$ bundle exec kitchen destroy
 
-- Verify
+...
+aws_vpc.vpc: Refreshing state... (ID: vpc-e2682d8b)
+aws_subnet.subnet: Refreshing state... (ID: subnet-1e592e65)
+aws_security_group.sg: Refreshing state... (ID: sg-3aaf4b52)
+aws_instance.server: Refreshing state... (ID: i-053a62d76234acfac)
+aws_instance.server: Destroying... (ID: i-053a62d76234acfac)
+aws_instance.server: Still destroying... (ID: i-053a62d76234acfac, 10s elapsed)
+aws_instance.server: Still destroying... (ID: i-053a62d76234acfac, 20s elapsed)
+aws_instance.server: Still destroying... (ID: i-053a62d76234acfac, 30s elapsed)
+aws_instance.server: Still destroying... (ID: i-053a62d76234acfac, 40s elapsed)
+aws_instance.server: Still destroying... (ID: i-053a62d76234acfac, 50s elapsed)
+aws_instance.server: Destruction complete after 51s
+aws_security_group.sg: Destroying... (ID: sg-3aaf4b52)
+aws_subnet.subnet: Destroying... (ID: subnet-1e592e65)
+aws_subnet.subnet: Destruction complete after 1s
+aws_security_group.sg: Destruction complete after 1s
+aws_vpc.vpc: Destroying... (ID: vpc-e2682d8b)
+aws_vpc.vpc: Destruction complete after 0s
 
-```markdown
-bundle exec kitchen converge
+Destroy complete! Resources: 4 destroyed.
+Finished destroying <default-aws> (1m37.10s).
+-----> Kitchen is finished. (1m37.64s)
 ```
 
 !SLIDE
-
-## commands: `bundle exec kitchen destroy`
-
-- destroys all running infrastructure
-- does not touch infrastructure not managed by `terraform`
-
-- note: `kitchen converge` can also remove parts of infrastructure (e.g. if you comment out your code)
+## cleanup : all tests fail
 
 !SLIDE
+## Console : EC2 terminated
+<img src="console_terminated.png">
 
-### Credentials - Option 1 - .aws/credentials
+_Pro Tip: destroyed / terminated instances will hang around for a bit (10 minutes?) before AWS cleans them up.  This can cause some issues with awspect if you spin resources back up immediately._
+
+!SLIDE
+# Questions / Discussion
+
+!SLIDE
+# Appendix
+
+!SLIDE
+### AWS Credentials - Option 1 - .aws/credentials
 - The default location is $HOME/.aws/credentials on Linux and OS X, or "%USERPROFILE%\.aws\credentials" for Windows users.  See http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html
 - When you create an AWS credentials file using the aws configure command, it creates a file with the following format:
 
@@ -687,9 +1080,16 @@ aws_secret_access_key={YOUR_SECRET_ACCESS_KEY}
 
 ```
 
+!SLIDE
 ### Credentials Option 2 - direnv / .envars
 - If you are using the [direnv](https://direnv.net/) utility, you should:
   * create a .envrc file (see .envrc.sample)
   * run `direnv allow` to set the environment variables
 
-- TBD
+```markdown
+.envrc
+
+export AWS_ACCESS_KEY_ID=[YOUR_AWS_ACCESS_KEY_ID]
+export AWS_SECRET_ACCESS_KEY=[YOUR_AWS_SECRET_ACCESS_KEY]
+export AWS_DEFAULT_REGION=eu-west-2  
+```

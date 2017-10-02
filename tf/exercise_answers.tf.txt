@@ -12,18 +12,21 @@ resource "aws_vpc" "vpc" {
   }
 }
 
-resource "aws_subnet" "main" {
+resource "aws_subnet" "subnet" {
   vpc_id     = "${aws_vpc.vpc.id}"
   cidr_block = "10.0.1.0/24"
 
   tags {
-    Name = "Main"
+    Name = "my-subnet"
   }
 }
 
 resource "aws_security_group" "sg" {
   name = "my-security-group"
-  vpc_id      = "${aws_vpc.vpc.id}"
+
+  tags {
+    Name = "my-security-group"
+  }
 
   ingress {
     from_port = 8080
@@ -34,19 +37,16 @@ resource "aws_security_group" "sg" {
 
   vpc_id = "${aws_vpc.vpc.id}"
 
-  tags {
-    Name = "my-security-group"
-  }
 }
 
 resource "aws_instance" "server" {
   ami = "${var.ami}"
   instance_type = "t2.micro"
 
-  security_groups = ["${aws_security_group.sg.id}"]
-  subnet_id = "${aws_subnet.main.id}"
-
   tags {
     Name = "my-server"
   }
+
+  security_groups = ["${aws_security_group.sg.id}"]
+  subnet_id = "${aws_subnet.subnet.id}"
 }
