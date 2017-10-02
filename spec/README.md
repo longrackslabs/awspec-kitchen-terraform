@@ -5,11 +5,14 @@
 - An AWS lab to get you familiar with syntax and features
 
 ## Prerequisites (not complete - please update/fix)
-- ruby (2.3.1)
-- ruby/gems fix for Windows
-- gem install bundler
-- bundle install --without showoff
-- (optional) `direnv`
+- `brew install ruby`
+- `brew install ruby-dev`
+- `brew install terraform`
+- `gem install bundler --pre`
+- `gem install test-kitchen`
+- `gem install awsecrets`
+- `gem install awspec`
+- `bundle install --without showoff`
 
 ## Getting Up and Running
 - To present with `deckrb` please run this command:
