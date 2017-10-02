@@ -140,6 +140,8 @@ _Code Kata is an attempt to bring this element of practice to software developme
 
 -- Dave Thomas Code Kata
 
+![fit](consultant.jpg)
+
 !SLIDE
 
 ## install all the things!
