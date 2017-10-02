@@ -126,7 +126,7 @@ Enables you to use multiple of these tools
 
 ## amazing!
 **amazing**
-  əˈmeɪzɪŋ/Submit
+  əˈmeɪzɪŋ
 
 _adjective_
   causing great surprise or wonder; astonishing.
