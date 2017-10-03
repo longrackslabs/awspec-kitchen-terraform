@@ -296,6 +296,9 @@ ec2 'my-ec2'
 - moves from a current state to target state (delta approach)
 - updates existing resources when allowed
 - recreates existing when updates are not allowed
+- calls `terraform apply` under the covers
+- would be nice to have a `terraform plan` equivalent, which is not available yet.  so be careful...
+- `terraform` bits are opaque, for example it not obvious where the tfstate files are kept and managed
 
 !SLIDE
 
@@ -311,7 +314,7 @@ ec2 'my-ec2'
 # exercise : vpc : write test
 
 ```markdown
-spec/vpc_spec.rb:
+spec/exercises_spec.rb:
 
 describe vpc('my-vpc') do
   it { should exist }
