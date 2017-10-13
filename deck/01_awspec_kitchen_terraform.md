@@ -5,6 +5,7 @@
 !SLIDE
 
 # what we are going to cover
+- aspirations
 - test driven development
 - red, green, blue cycle
 - composable DevOps toolchain
@@ -13,20 +14,33 @@
 
 !SLIDE
 
-# why are we doing this?
-<img style="float: right;" src="saw.jpg">
+# we aspire to...
 
-- Training is a force-multipler. One of us learns, we all can learn
-- As a practice, it is important our skills and capabilities cutting edge
-- Teaching a topic forces you to really know the material
-- Presenting to a group is an important and professional skill
+Set the standard for delivering high-quality software
+
+# we are *-driven
+
+We are -driven
+
+- test-
+- pattern-
+- behavior-
+- cloud-
+- security-
+
+# we are T-shaped
+<img style="float: right;" src="t-shaped.jpg">
+
+- We have breadth and depth
+- We are hungry learners
+- We are strong collaborators
 
 !SLIDE
 
 ## test driven development (TDD)
 <img style="float: right;" src="south_park.jpg">
 
-Test-Driven Development (TDD) is a popular software development process that involves writing tests and code in short, repeating development cycles with the goal to enforce good design and enhance confidence.
+Test-Driven Development (TDD) is a software development practice of writing tests first, then write code in short, repeating cycles to encourage good design, enhance quality and confidence.
 
 Benefits:
 
@@ -36,6 +50,8 @@ Benefits:
 - Safer Refactoring
 - Fewer Bugs
 - Test Automation
+
+There is a lot of *talk* about TDD, but not as much actual practice
 
 https://www.madetech.com/blog/9-benefits-of-test-driven-development
 
@@ -60,11 +76,11 @@ devops.com: https://devops.com/agile-infrastructure-infrastructure-deserves-test
 ## why infrastructure as code?
 <img style="float: right;" src="grumpy_cat.jpg">
 
-- provide a codified workflow to create infrastructure
-- expose a workflow for managing updates to existing infrastructure
-- integrate with application code workflows (Git, SCM, code review)
+- better, faster, cheaper
+- provides a codified workflow for creating & managing infrastructure
+- integrate with application code workflows (Git, branch & merge, pair-programming, peer review)
 - provide modular, sharable components for separation of concerns
-- distribution of knowledge, enables self-service (and vacations)
+- distribution of knowledge, enables self-service (and vacations), avoids 'shadow IT'
 - test, build, test, deploy, run, verify
 
 !SLIDE
@@ -81,12 +97,20 @@ devops.com: https://devops.com/agile-infrastructure-infrastructure-deserves-test
 !SLIDE
 
 # tools
-- [kitchen](https://docs.chef.io/kitchen.html)
-- [terraform](https://www.terraform.io/)
 - [awspec](https://github.com/k1LoW/awspec)
+- [terraform](https://www.terraform.io/)
+- [kitchen](https://docs.chef.io/kitchen.html)
 
 !SLIDE
 
+# awspec
+
+- `awspec` is RSpec tests for your AWS resources
+- open-source testing framework for infrastructure with a human-readable language for specifying compliance, security and other policy requirements of AWS infrastructure
+- allows for a rich set of AWS specific testing
+- you can integrate automated tests that check for adherence to requirements & policy into any stage of your deployment pipeline.
+
+!SLIDE
 
 # kitchen
 
@@ -115,14 +139,6 @@ Enables you to use multiple of these tools
 
 !SLIDE
 
-# awspec
-
-- `awspec` is RSpec tests for your AWS resources
-- open-source testing framework for infrastructure with a human-readable language for specifying compliance, security and other policy requirements of AWS infrastructure
-- allows for a rich set of AWS specific testing
-- you can integrate automated tests that check for adherence to requirements & policy into any stage of your deployment pipeline.
-
-!SLIDE
 
 ## amazing!
 **amazing**
@@ -141,7 +157,7 @@ _adjective_
 
 _Code Kata is an attempt to bring this element of practice to software development. A kata is an exercise in karate where you repeat a form many, many times, making little improvements in each. The intent behind code kata is similar._
 
--- Dave Thomas Code Kata
+-- Dave Thomas _Code Kata_
 
 !SLIDE
 
@@ -184,6 +200,24 @@ _Code Kata is an attempt to bring this element of practice to software developme
 
 !SLIDE
 
+
+## awspec syntax: `test cases`
+
+- awspec is a AWS domain-specific language (DSL)
+- enables the writing of test cases specific to AWS
+- awspec objects map to AWS services and resources
+- written in natural language
+- connects via AWS API's to execute tests
+- integrates with kitchen as a verifier
+
+```json
+describe s3_bucket('my-bucket') do
+  it { should exist }
+end
+```
+
+!SLIDE
+
 ## terraform config syntax: `general overview`
 
 This is what `terraform's` domain-specific language looks like...
@@ -204,23 +238,6 @@ variable = [{
     "default" : "ami-ed100689"
   }
 }]
-```
-
-!SLIDE
-
-## awspec syntax: `test cases`
-
-- awspec is a AWS domain-specific language (DSL)
-- enables the writing of test cases specific to AWS
-- awspec objects map to AWS services and resources
-- written in natural language
-- connects via AWS API's to execute tests
-- integrates with kitchen as a verifier
-
-```json
-describe s3_bucket('my-bucket') do
-  it { should exist }
-end
 ```
 
 !SLIDE
@@ -265,7 +282,7 @@ suites:
 - reports success & fail and details
 
 ```markdown
-$ bundle exec kitchen converge
+$ bundle exec kitchen verify
 
 vpc 'my-vpc'
   should exist
@@ -311,6 +328,10 @@ ec2 'my-ec2'
 
 !SLIDE
 
+# exercise : vpc
+Create a vpc with with CIDR block 10.0.1.0/16
+
+!SLIDE
 # exercise : vpc : write test
 
 ```markdown
@@ -365,8 +386,8 @@ Finished converging <default-aws> (0m15.13s).
 
 [terraform:aws_vpc](https://www.terraform.io/docs/providers/aws/d/vpc.html)
 
-!SLIDE
 
+!SLIDE
 # exercise : vpc : test passes
 
 ```markdown
@@ -382,7 +403,6 @@ Finished in 0.93456 seconds (files took 1.44 seconds to load)
 ```
 
 !SLIDE
-
 # exercise : subnet
 Create a subnet with a Name tag and CIDR block 10.0.1.0/24
 
@@ -1026,11 +1046,9 @@ resource "aws_instance" "server" {
 
 
 !SLIDE
-# Teardown & Cleanup
-<img style="float: right;" src="burn-it-down.png">
+## Teardown & Cleanup
 
-!SLIDE
-## kitchen destroy
+<img style="float: right;" src="burn-it-down.png">
 
 ```markdown
 $ bundle exec kitchen destroy
@@ -1061,6 +1079,7 @@ Finished destroying <default-aws> (1m37.10s).
 
 !SLIDE
 ## cleanup : all tests fail
+
 <img style="float: right;" src="picard-facepalm.jpg">
 
 this.did.not.do.what.i.expected
