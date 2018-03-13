@@ -1,10 +1,8 @@
 provider "aws" {
-  access_key = "${var.access_key}"
-  secret_key = "${var.secret_key}"
   region = "${var.region}"
 }
 
-resource "aws_vpc" "vpc" {
+resource "aws_vpc" "my-vpc" {
   cidr_block       = "10.0.0.0/16"
 
   tags {
@@ -12,8 +10,8 @@ resource "aws_vpc" "vpc" {
   }
 }
 
-resource "aws_subnet" "subnet" {
-  vpc_id     = "${aws_vpc.vpc.id}"
+resource "aws_subnet" "my-subnet" {
+  vpc_id     = "${aws_vpc.my-vpc.id}"
   cidr_block = "10.0.1.0/24"
 
   tags {
@@ -21,7 +19,7 @@ resource "aws_subnet" "subnet" {
   }
 }
 
-resource "aws_security_group" "sg" {
+resource "aws_security_group" "my-security-group" {
   name = "my-security-group"
 
   tags {
@@ -35,11 +33,11 @@ resource "aws_security_group" "sg" {
     cidr_blocks = ["10.0.0.0/16"]
   }
 
-  vpc_id = "${aws_vpc.vpc.id}"
+  vpc_id = "${aws_vpc.my-vpc.id}"
 
 }
 
-resource "aws_instance" "server" {
+resource "aws_instance" "my-server" {
   ami = "${var.ami}"
   instance_type = "t2.micro"
 
@@ -47,6 +45,6 @@ resource "aws_instance" "server" {
     Name = "my-server"
   }
 
-  security_groups = ["${aws_security_group.sg.id}"]
-  subnet_id = "${aws_subnet.subnet.id}"
+  security_groups = ["${aws_security_group.my-security-group.id}"]
+  subnet_id = "${aws_subnet.my-subnet.id}"
 }
