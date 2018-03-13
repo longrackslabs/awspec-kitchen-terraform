@@ -21,12 +21,12 @@ describe security_group('my-security-group') do
 end
 
 # exercise ec2 instance
-describe ec2('my-server-02') do
+describe ec2(EC2Helper.GetIdFromName('my-server')) do
   it { should exist }
   it { should be_running }
-  its(:image_id) { should eq 'ami-ed100689' }
+  its(:image_id) { should eq 'ami-4f55e332' }
   its(:instance_type) { should eq 't2.micro' }
-  it { should have_tag('Name').value('my-server-02') }
+  it { should have_tag('Name').value('my-server') }
   it { should have_security_group('my-security-group') }
   it { should belong_to_vpc('my-vpc') }
   it { should belong_to_subnet('my-subnet') }

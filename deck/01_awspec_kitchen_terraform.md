@@ -254,7 +254,7 @@ variable = [{
 ```markdown
 driver:
   name: terraform
-  root_module_directory: tf
+  root_module_directory: tff
 
 provisioner:
   name: terraform
@@ -814,7 +814,7 @@ Finished in 1.2 seconds (files took 1.43 seconds to load)
 ## exercise : ec2 instance : write test
 
 ```markdown
-describe ec2('my-server') do
+describe ec2(EC2Helper.GetIdFromName('my-server')) do
   it { should exist }
   it { should be_running }
   its(:image_id) { should eq 'ami-ed100689' }
