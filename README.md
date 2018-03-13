@@ -17,6 +17,11 @@
 - `gem install awspec`
 - `bundle install --without showoff`
 
+## Versions
+- awspec requires terraform version 0.10.2
+- tested with ruby version 2.4.3
+
+
 ## Getting Up and Running
 - To present with `deckrb` please run this command:
 

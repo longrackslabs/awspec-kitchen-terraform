@@ -1,1 +1,33 @@
 require './spec/spec_helper'
+
+# exercise vpc
+describe vpc('my-vpc') do
+  it { should exist }
+  its(:cidr_block) { should eq '10.0.0.0/16' }
+end
+
+# exercise subnet
+describe subnet('my-subnet') do
+  it { should exist }
+  its(:cidr_block) { should eq '10.0.1.0/24' }
+end
+
+# exercise security group
+describe security_group('my-security-group') do
+  it { should exist }
+  it { should have_tag('Name').value('my-security-group') }
+  its(:inbound) { should be_opened(8080).protocol('tcp') }
+  it { should belong_to_vpc('my-vpc') }
+end
+
+# exercise ec2 instance
+describe ec2('my-server') do
+  it { should exist }
+  it { should be_running }
+  its(:image_id) { should eq 'ami-ed100689' }
+  its(:instance_type) { should eq 't2.micro' }
+  it { should have_tag('Name').value('my-server') }
+  it { should have_security_group('my-security-group') }
+  it { should belong_to_vpc('my-vpc') }
+  it { should belong_to_subnet('my-subnet') }
+end
