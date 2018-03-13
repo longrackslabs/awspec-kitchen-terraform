@@ -254,7 +254,7 @@ variable = [{
 ```markdown
 driver:
   name: terraform
-  directory: tf
+  root_module_directory: tf
 
 provisioner:
   name: terraform
