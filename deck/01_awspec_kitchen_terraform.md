@@ -186,7 +186,7 @@ _Code Kata is an attempt to bring this element of practice to software developme
   aws_secret_access_key={YOUR_SECRET_ACCESS_KEY}
 
   ```
-  
+
 - AMI: Update with AMI for your region
   - https://aws.amazon.com/amazon-linux-ami/
 
@@ -542,7 +542,7 @@ rspec ./spec/exercises_spec.rb:17 # security_group 'my-security-group' should ha
 ```
 tf/main.tf
 
-resource "aws_security_group" "sg" {
+resource "aws_security_group" "my-security-group" {
   name = "my-security-group"
 
   tags {
@@ -555,7 +555,7 @@ resource "aws_security_group" "sg" {
 $ bundle exec kitchen converge
 ...
 
-aws_security_group.sg: Creating...
+aws_security_group.my-security-group: Creating...
   description: "" => "Managed by Terraform"
   egress.#:    "" => "<computed>"
   ingress.#:   "" => "<computed>"
@@ -564,7 +564,7 @@ aws_security_group.sg: Creating...
   tags.%:      "" => "1"
   tags.Name:   "" => "my-security-group"
   vpc_id:      "" => "<computed>"
-aws_security_group.sg: Creation complete after 0s (ID: sg-1747a27f)
+aws_security_group.my-security-group: Creation complete after 0s (ID: sg-1747a27f)
 
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 ```
@@ -622,7 +622,7 @@ rspec ./spec/exercises_spec.rb:18 # security_group 'my-security-group' inbound s
 ```markdown
 tf/main.tf
 
-resource "aws_security_group" "sg" {
+resource "aws_security_group" "my-security-group" {
   name = "my-security-group"
 
   tags {
@@ -642,7 +642,7 @@ resource "aws_security_group" "sg" {
 $ bundle exec kitchen converge
 ...
 
-aws_security_group.sg: Modifying... (ID: sg-1747a27f)
+aws_security_group.my-security-group: Modifying... (ID: sg-1747a27f)
   ingress.#:                            "0" => "1"
   ingress.542945394.cidr_blocks.#:      "0" => "1"
   ingress.542945394.cidr_blocks.0:      "" => "10.0.0.0/16"
@@ -652,7 +652,7 @@ aws_security_group.sg: Modifying... (ID: sg-1747a27f)
   ingress.542945394.security_groups.#:  "0" => "0"
   ingress.542945394.self:               "" => "false"
   ingress.542945394.to_port:            "" => "8080"
-aws_security_group.sg: Modifications complete after 0s (ID: sg-1747a27f)
+aws_security_group.my-security-group: Modifications complete after 0s (ID: sg-1747a27f)
 
 Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
 ```
@@ -722,7 +722,7 @@ rspec ./spec/exercises_spec.rb:19 # security_group 'my-security-group' should be
 ```
 tf/main.tf
 
-resource "aws_security_group" "sg" {
+resource "aws_security_group" "my-security-group" {
   name = "my-security-group"
 
   tags {
@@ -743,7 +743,7 @@ resource "aws_security_group" "sg" {
 ```
 $ bundle exec kitchen converge
 ...
-aws_security_group.sg: Creating...
+aws_security_group.my-security-group: Creating...
   description:                          "" => "Managed by Terraform"
   egress.#:                             "" => "<computed>"
   ingress.#:                            "" => "1"
@@ -760,7 +760,7 @@ aws_security_group.sg: Creating...
   tags.%:                               "" => "1"
   tags.Name:                            "" => "my-security-group"
   vpc_id:                               "" => "vpc-e2682d8b"
-aws_security_group.sg: Creation complete after 2s (ID: sg-3aaf4b52)
+aws_security_group.my-security-group: Creation complete after 2s (ID: sg-3aaf4b52)
 ```
 
 !SLIDE
@@ -866,7 +866,7 @@ resource "aws_instance" "server" {
     Name = "my-server"
   }
 
-  security_groups = ["${aws_security_group.sg.id}"]
+  security_groups = ["${aws_security_group.my-security-group.id}"]
   subnet_id = "${aws_subnet.subnet.id}"
 }
 ```
@@ -994,7 +994,7 @@ resource "aws_subnet" "subnet" {
   }
 }
 
-resource "aws_security_group" "sg" {
+resource "aws_security_group" "my-security-group" {
   name = "my-security-group"
 
   tags {
@@ -1019,7 +1019,7 @@ resource "aws_instance" "server" {
     Name = "my-server-02"
   }
 
-  security_groups = ["${aws_security_group.sg.id}"]
+  security_groups = ["${aws_security_group.my-security-group.id}"]
   subnet_id = "${aws_subnet.subnet.id}"
 }
 ```
@@ -1054,7 +1054,7 @@ $ bundle exec kitchen destroy
 ...
 aws_vpc.vpc: Refreshing state... (ID: vpc-e2682d8b)
 aws_subnet.subnet: Refreshing state... (ID: subnet-1e592e65)
-aws_security_group.sg: Refreshing state... (ID: sg-3aaf4b52)
+aws_security_group.my-security-group: Refreshing state... (ID: sg-3aaf4b52)
 aws_instance.server: Refreshing state... (ID: i-053a62d76234acfac)
 aws_instance.server: Destroying... (ID: i-053a62d76234acfac)
 aws_instance.server: Still destroying... (ID: i-053a62d76234acfac, 10s elapsed)
@@ -1063,10 +1063,10 @@ aws_instance.server: Still destroying... (ID: i-053a62d76234acfac, 30s elapsed)
 aws_instance.server: Still destroying... (ID: i-053a62d76234acfac, 40s elapsed)
 aws_instance.server: Still destroying... (ID: i-053a62d76234acfac, 50s elapsed)
 aws_instance.server: Destruction complete after 51s
-aws_security_group.sg: Destroying... (ID: sg-3aaf4b52)
+aws_security_group.my-security-group: Destroying... (ID: sg-3aaf4b52)
 aws_subnet.subnet: Destroying... (ID: subnet-1e592e65)
 aws_subnet.subnet: Destruction complete after 1s
-aws_security_group.sg: Destruction complete after 1s
+aws_security_group.my-security-group: Destruction complete after 1s
 aws_vpc.vpc: Destroying... (ID: vpc-e2682d8b)
 aws_vpc.vpc: Destruction complete after 0s
 
