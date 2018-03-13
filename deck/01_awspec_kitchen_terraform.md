@@ -186,7 +186,7 @@ _Code Kata is an attempt to bring this element of practice to software developme
   aws_secret_access_key={YOUR_SECRET_ACCESS_KEY}
 
   ```
-
+  
 - AMI: Update with AMI for your region
   - https://aws.amazon.com/amazon-linux-ami/
 
@@ -255,9 +255,6 @@ variable = [{
 driver:
   name: terraform
   directory: tf
-  variables:
-    access_key: <%= ENV['AWS_ACCESS_KEY_ID'] %>
-    secret_key: <%= ENV['AWS_SECRET_ACCESS_KEY'] %>
 
 provisioner:
   name: terraform
@@ -440,14 +437,15 @@ Finished in 0.96648 seconds (files took 1.39 seconds to load)
 ```markdown
 tf/main.tf
 
-resource "aws_subnet" "subnet" {
-  vpc_id     = "${aws_vpc.vpc.id}"
+resource "aws_subnet" "my-subnet" {
+  vpc_id     = "${aws_vpc.my-vpc.id}"
   cidr_block = "10.0.1.0/24"
 
   tags {
     Name = "my-subnet"
   }
 }
+
 ```
 
 ```markdown
