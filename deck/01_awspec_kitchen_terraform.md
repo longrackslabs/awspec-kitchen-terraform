@@ -831,7 +831,7 @@ end
 
 ```markdown
 $ bundle exec kitchen verify
-ec2 'my-server'
+ec2 ''
   should exist (FAILED - 1)
   should be running (FAILED - 2)
   should have tag "Name" (FAILED - 3)
@@ -839,26 +839,29 @@ ec2 'my-server'
   should belong to vpc "my-vpc" (FAILED - 5)
   should belong to subnet "my-subnet" (FAILED - 6)
   image_id
-    example at ./spec/exercises_spec.rb:25 (FAILED - 7)
+    example at ./spec/exercises_spec.rb:27 (FAILED - 7)
   instance_type
-    example at ./spec/exercises_spec.rb:26 (FAILED - 8)
+    example at ./spec/exercises_spec.rb:28 (FAILED - 8)
 
-Failed examples:
+    Finished in 0.39771 seconds (files took 2.26 seconds to load)
+    16 examples, 8 failures
 
-rspec ./spec/exercises_spec.rb:23 # ec2 'my-server' should exist
-rspec ./spec/exercises_spec.rb:24 # ec2 'my-server' should be running
-rspec ./spec/exercises_spec.rb:27 # ec2 'my-server' should have tag "Name"
-rspec ./spec/exercises_spec.rb:28 # ec2 'my-server' should have security group "my-security-group"
-rspec ./spec/exercises_spec.rb:29 # ec2 'my-server' should belong to vpc "my-vpc"
-rspec ./spec/exercises_spec.rb:30 # ec2 'my-server' should belong to subnet "my-subnet"
-rspec ./spec/exercises_spec.rb:25 # ec2 'my-server' image_id
-rspec ./spec/exercises_spec.rb:26 # ec2 'my-server' instance_type
+  Failed examples:
+
+  rspec ./spec/exercises_spec.rb:25 # ec2 '' should exist
+  rspec ./spec/exercises_spec.rb:26 # ec2 '' should be running
+  rspec ./spec/exercises_spec.rb:29 # ec2 '' should have tag "Name"
+  rspec ./spec/exercises_spec.rb:30 # ec2 '' should have security group "my-security-group"
+  rspec ./spec/exercises_spec.rb:31 # ec2 '' should belong to vpc "my-vpc"
+  rspec ./spec/exercises_spec.rb:32 # ec2 '' should belong to subnet "my-subnet"
+  rspec ./spec/exercises_spec.rb:27 # ec2 '' image_id
+  rspec ./spec/exercises_spec.rb:28 # ec2 '' instance_type
 
 !SLIDE
 ## exercise : ec2 : write code
 
 ```markdown
-resource "aws_instance" "server" {
+resource "aws_instance" "my-server" {
   ami = "${var.ami}"
   instance_type = "t2.micro"
 
@@ -867,46 +870,72 @@ resource "aws_instance" "server" {
   }
 
   security_groups = ["${aws_security_group.my-security-group.id}"]
-  subnet_id = "${aws_subnet.subnet.id}"
+  subnet_id = "${aws_subnet.my-subnet.id}"
 }
 ```
 
+!SLIDE
+## exercise : ec2 : run code
 ```markdown
 $ bundle exec kitchen converge
-aws_instance.server: Creating...
-  ami:                          "" => "ami-ed100689"
-  associate_public_ip_address:  "" => "<computed>"
-  availability_zone:            "" => "<computed>"
-  ebs_block_device.#:           "" => "<computed>"
-  ephemeral_block_device.#:     "" => "<computed>"
-  instance_state:               "" => "<computed>"
-  instance_type:                "" => "t2.micro"
-  ipv6_address_count:           "" => "<computed>"
-  ipv6_addresses.#:             "" => "<computed>"
-  key_name:                     "" => "<computed>"
-  network_interface.#:          "" => "<computed>"
-  network_interface_id:         "" => "<computed>"
-  placement_group:              "" => "<computed>"
-  primary_network_interface_id: "" => "<computed>"
-  private_dns:                  "" => "<computed>"
-  private_ip:                   "" => "<computed>"
-  public_dns:                   "" => "<computed>"
-  public_ip:                    "" => "<computed>"
-  root_block_device.#:          "" => "<computed>"
-  security_groups.#:            "" => "1"
-  security_groups.3781644720:   "" => "sg-3aaf4b52"
-  source_dest_check:            "" => "true"
-  subnet_id:                    "" => "subnet-1e592e65"
-  tags.%:                       "" => "1"
-  tags.Name:                    "" => "my-server-02"
-  tenancy:                      "" => "<computed>"
-  volume_tags.%:                "" => "<computed>"
-  vpc_security_group_ids.#:     "" => "<computed>"
-aws_instance.server: Still creating... (10s elapsed)
-aws_instance.server: Still creating... (20s elapsed)
-aws_instance.server: Creation complete after 26s (ID: i-053a62d76234acfac)
+-----> Starting Kitchen (v1.20.0)
+$$$$$$ Running command `terraform version`
+       Terraform v0.10.2
 
-Apply complete! Resources: 1 added, 0 changed, 1 destroyed.
+       Your version of Terraform is out of date! The latest version
+       is 0.11.3. You can update by downloading from www.terraform.io
+$$$$$$ Terraform v0.10.2 is supported
+-----> Converging <default-aws>...
+$$$$$$ Running command `terraform workspace select kitchen-terraform-default-aws`
+$$$$$$ Running command `terraform get -update /Users/georgep/code/github/awspec-kitchen-terraform/tf`
+$$$$$$ Running command `terraform validate -check-variables=true    /Users/georgep/code/github/awspec-kitchen-terraform/tf`
+$$$$$$ Running command `terraform apply -lock=true -lock-timeout=0s -input=false -auto-approve=true  -parallelism=10 -refresh=true   /Users/georgep/code/github/awspec-kitchen-terraform/tf`
+       aws_vpc.my-vpc: Refreshing state... (ID: vpc-6cd06b05)
+       aws_security_group.my-security-group: Refreshing state... (ID: sg-20a2e749)
+       aws_subnet.my-subnet: Refreshing state... (ID: subnet-4d9e4936)
+       aws_instance.my-server: Creating...
+         ami:                          "" => "ami-4f55e332"
+         associate_public_ip_address:  "" => "<computed>"
+         availability_zone:            "" => "<computed>"
+         ebs_block_device.#:           "" => "<computed>"
+         ephemeral_block_device.#:     "" => "<computed>"
+         instance_state:               "" => "<computed>"
+         instance_type:                "" => "t2.micro"
+         ipv6_address_count:           "" => "<computed>"
+         ipv6_addresses.#:             "" => "<computed>"
+         key_name:                     "" => "<computed>"
+         network_interface.#:          "" => "<computed>"
+         network_interface_id:         "" => "<computed>"
+         placement_group:              "" => "<computed>"
+         primary_network_interface_id: "" => "<computed>"
+         private_dns:                  "" => "<computed>"
+         private_ip:                   "" => "<computed>"
+         public_dns:                   "" => "<computed>"
+         public_ip:                    "" => "<computed>"
+         root_block_device.#:          "" => "<computed>"
+         security_groups.#:            "" => "1"
+         security_groups.4076058227:   "" => "sg-20a2e749"
+         source_dest_check:            "" => "true"
+         subnet_id:                    "" => "subnet-4d9e4936"
+         tags.%:                       "" => "1"
+         tags.Name:                    "" => "my-server"
+         tenancy:                      "" => "<computed>"
+         volume_tags.%:                "" => "<computed>"
+         vpc_security_group_ids.#:     "" => "<computed>"
+       aws_instance.my-server: Still creating... (10s elapsed)
+       aws_instance.my-server: Still creating... (20s elapsed)
+       aws_instance.my-server: Creation complete (ID: i-07758918fc68a2629)
+
+       Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+$$$$$$ Running command `terraform output -json`
+       The state file either has no outputs defined, or all the defined
+       outputs are empty. Please define an output in your configuration
+       with the `output` keyword and run `terraform refresh` for it to
+       become available. If you are using interpolation, please verify
+       the interpolated value is not empty. You can use the
+       `terraform console` command to assist.
+       Finished converging <default-aws> (0m29.30s).
+-----> Kitchen is finished. (0m29.99s)
 ```
 
 !SLIDE
@@ -915,7 +944,7 @@ Apply complete! Resources: 1 added, 0 changed, 1 destroyed.
 ```markdown
 $ bundle exec kitchen verify
 ...
-ec2 'my-server-02'
+ec2 'i-07758918fc68a2629'
   should exist
   should be running
   should have tag "Name"
@@ -923,18 +952,20 @@ ec2 'my-server-02'
   should belong to vpc "my-vpc"
   should belong to subnet "my-subnet"
   image_id
-    should eq "ami-ed100689"
+    should eq "ami-4f55e332"
   instance_type
     should eq "t2.micro"
 
-Finished in 0.96834 seconds (files took 1.44 seconds to load)
+Finished in 0.61685 seconds (files took 2.3 seconds to load)
+16 examples, 0 failures
+
+       Finished verifying <default-aws> (0m5.28s).
+-----> Kitchen is finished. (0m5.89s)
 ```
 
 !SLIDE
 ## Final tests
 ```markdown
-require './spec/spec_helper'
-
 describe vpc('my-vpc') do
   it { should exist }
   its(:cidr_block) { should eq '10.0.0.0/16' }
@@ -952,12 +983,12 @@ describe security_group('my-security-group') do
   it { should belong_to_vpc('my-vpc') }
 end
 
-describe ec2('my-server-02') do
+describe ec2(EC2Helper.GetIdFromName('my-server')) do
   it { should exist }
   it { should be_running }
-  its(:image_id) { should eq 'ami-ed100689' }
+  its(:image_id) { should eq 'ami-4f55e332' }
   its(:instance_type) { should eq 't2.micro' }
-  it { should have_tag('Name').value('my-server-02') }
+  it { should have_tag('Name').value('my-server') }
   it { should have_security_group('my-security-group') }
   it { should belong_to_vpc('my-vpc') }
   it { should belong_to_subnet('my-subnet') }
@@ -972,12 +1003,9 @@ end
 tf/main.tf
 
 provider "aws" {
-  access_key = "${var.access_key}"
-  secret_key = "${var.secret_key}"
-  region = "${var.region}"
 }
 
-resource "aws_vpc" "vpc" {
+resource "aws_vpc" "my-vpc" {
   cidr_block       = "10.0.0.0/16"
 
   tags {
@@ -985,8 +1013,8 @@ resource "aws_vpc" "vpc" {
   }
 }
 
-resource "aws_subnet" "subnet" {
-  vpc_id     = "${aws_vpc.vpc.id}"
+resource "aws_subnet" "my-subnet" {
+  vpc_id     = "${aws_vpc.my-vpc.id}"
   cidr_block = "10.0.1.0/24"
 
   tags {
@@ -1008,19 +1036,20 @@ resource "aws_security_group" "my-security-group" {
     cidr_blocks = ["10.0.0.0/16"]
   }
 
-  vpc_id = "${aws_vpc.vpc.id}"
+  vpc_id = "${aws_vpc.my-vpc.id}"
+
 }
 
-resource "aws_instance" "server" {
+resource "aws_instance" "my-server" {
   ami = "${var.ami}"
   instance_type = "t2.micro"
 
   tags {
-    Name = "my-server-02"
+    Name = "my-server"
   }
 
   security_groups = ["${aws_security_group.my-security-group.id}"]
-  subnet_id = "${aws_subnet.subnet.id}"
+  subnet_id = "${aws_subnet.my-subnet.id}"
 }
 ```
 
