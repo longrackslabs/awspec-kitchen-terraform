@@ -4,7 +4,7 @@
 - An introduction to test driven infrastructure
 - An introduction to the basics of kitchen
 - An introduction to the basics of awspec
-- An introduction to the basics of terraform
+- An introduction to the basics of terraform. *requires version v0.10.2. sorry*
 - An AWS lab to get you familiar with syntax and features
 
 ## Prerequisites
